@@ -43,6 +43,7 @@ import ReaderPage from './pages/ReaderPage'
 import AdminDashboard from './pages/AdminPage'
 import MemberDashboard from './pages/MemberDashboard'
 import Toast from './components/Toast'
+import PublicationDetailPage from './components/PublicationDetailPage'
 
 export const ToastContext = createContext()
 export const AuthContext = createContext()
@@ -85,6 +86,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login/member" element={<MemberLoginPage />} />
           <Route path="/login/guest" element={<GuestLoginPage />} />
+           <Route path="/publication/:id" element={<PublicationDetailPage />} />
           <Route path="/read/:id" element={<ReaderPage />} />
           <Route path="/admin-dashboard/*" element={
             user?.role === 'admin' ? <AdminDashboard /> : <Navigate to="/" />

@@ -52,9 +52,14 @@ const HomePage = () => {
     setFilteredPublications(filtered)
   }
 
-  const handleRead = (publication) => {
-    navigate(`/read/${publication.id}`)
+  // const handleRead = (publication) => {
+  //   navigate(`/read/${publication.id}`)
+  // }
+
+   const handleRead = (publication) => {
+    navigate(`/publication/${publication.id}`)  // Changed from `/read/${publication.id}`
   }
+
 
   const handleShare = (title) => {
     if (navigator.share) {
@@ -79,11 +84,6 @@ const HomePage = () => {
       <HeroSection />
       <div className="container mx-auto px-4 py-8">
         <StatsBanner />
-        {/* <SearchFilters
-          onSearch={handleSearch}
-          committees={committees}
-          topics={topics}
-        /> */}
         <PublicationsGrid
           publications={filteredPublications}
           onRead={handleRead}
