@@ -21,7 +21,7 @@ const MemberSidebar = () => {
 
   const sections = [
     { id: 'home', icon: FaTachometerAlt, label: 'Dashboard', path: '/member-dashboard' },
-    { id: 'publications', icon: FaBook, label: 'My Publications', path: '/member-dashboard/publications' },
+    { id: 'publications', icon: FaBook, label: ' Publications', path: '/member-dashboard/publications' },
     { id: 'saved', icon: FaBookmark, label: 'Saved Items', path: '/member-dashboard/saved' },
     { id: 'history', icon: FaHistory, label: 'Reading History', path: '/member-dashboard/history' },
     { id: 'profile', icon: FaUserCircle, label: 'Profile', path: '/member-dashboard/profile' }

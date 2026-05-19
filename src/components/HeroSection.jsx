@@ -15,13 +15,13 @@ const HeroSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto animate-fade-up" style={{ animationDelay: '0.2s' }}>
           <div className="bg-white/20 backdrop-blur-lg rounded-2xl px-6 py-4 transform hover:scale-105 transition-all duration-300">
             <FaUsers className="text-4xl mb-2 mx-auto" />
-            <p className="text-3xl font-bold">5,30,000+</p>
+            <p className="text-3xl font-bold">407,629+</p>
             <p className="text-sm opacity-90">Members</p>
           </div>
           <div className="bg-white/20 backdrop-blur-lg rounded-2xl px-6 py-4 transform hover:scale-105 transition-all duration-300">
             <FaGraduationCap className="text-4xl mb-2 mx-auto" />
-            <p className="text-3xl font-bold">10 Lakh+</p>
-            <p className="text-sm opacity-90">Students</p>
+            <p className="text-3xl font-bold">45,000 </p>
+            <p className="text-sm opacity-90">International Member</p>
           </div>
           <div className="bg-white/20 backdrop-blur-lg rounded-2xl px-6 py-4 transform hover:scale-105 transition-all duration-300">
             <FaGlobe className="text-4xl mb-2 mx-auto" />
