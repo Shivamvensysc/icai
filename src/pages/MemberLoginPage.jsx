@@ -154,13 +154,13 @@ const MemberLoginPage = () => {
 
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div className="bg-icai text-white p-6 text-center">
-              <FaIdCard className="text-5xl mx-auto mb-3" />
+            <div className="bg-icai text-white p-3 text-center">
+              <FaIdCard className="text-5xl mx-auto mb-2" />
               <h1 className="text-2xl font-bold">ICAI Member Login</h1>
-              <p className="text-sm opacity-90 mt-1">Access all publications with your SSP credentials</p>
+              <p className="text-sm opacity-90 ">Access all publications with your SSP credentials</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            <form onSubmit={handleSubmit} className="p-5 space-y-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">ICAI Member ID</label>
                 <input
@@ -168,7 +168,7 @@ const MemberLoginPage = () => {
                   placeholder="Enter your ICAI Member ID"
                   value={formData.memberId}
                   onChange={(e) => setFormData({ ...formData, memberId: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-icai focus:ring-1 focus:ring-icai transition"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:border-icai focus:ring-1 focus:ring-icai transition"
                   required
                 />
               </div>
@@ -180,7 +180,7 @@ const MemberLoginPage = () => {
                   placeholder="Enter your SSP password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-icai focus:ring-1 focus:ring-icai transition"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:border-icai focus:ring-1 focus:ring-icai transition"
                   required
                 />
               </div>
@@ -189,8 +189,8 @@ const MemberLoginPage = () => {
                 <FaSignInAlt className="inline mr-2" />Login with SSO
               </button>
 
-              <div className="text-center text-sm text-gray-500 pt-4 border-t">
-                <FaShieldAlt className="inline mr-1 text-green-600" />
+              <div className="text-center text-sm text-gray-500 pt-2 border-t">
+                <FaShieldAlt className="inline mr-1 text-xs text-green-600" />
                 Secured by ICAI SSP Portal | 256-bit SSL Encryption
               </div>
             </form>
@@ -212,14 +212,14 @@ const MemberLoginPage = () => {
               </div>
             </div>
 
-            <div className="bg-gray-50 px-6 py-4 text-center">
+            <div className="bg-gray-50 px-6 py-3 text-center">
               <p className="text-sm text-gray-600">
                 Don't have SSP access? <Link to="/login/guest" className="text-icai font-semibold hover:underline">Continue as Guest</Link>
               </p>
             </div>
           </div>
 
-          <div className="mt-6 text-center text-xs text-gray-500">
+          <div className="mt-4 text-center text-xs text-gray-500">
             <p>© 2024 ICAI Publication Portal. All rights reserved.</p>
           </div>
         </div>

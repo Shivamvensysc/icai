@@ -126,7 +126,7 @@ const MemberDashboardHome = () => {
 const MemberPublications = () => {
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-icai">My Publications</h2>
+      <h2 className="text-2xl font-bold text-icai">Publications</h2>
       <MemberPublicationsGrid publications={publications} />
     </div>
   )
