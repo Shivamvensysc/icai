@@ -249,14 +249,27 @@ const PublicationDetailPage = () => {
     )
   }
 
-  const handleReadNow = () => {
-    if (user) {
-      navigate(`/read/${publication.id}`)
-    } else {
-      showToast('Please login or register as guest to read this publication', 'info')
-      navigate('/login/guest')
-    }
+//   const handleReadNow = () => {
+//     if (user) {
+//       navigate(`/read/${publication.id}`)
+//     } else {
+//       showToast('Please login or register as guest to read this publication', 'info')
+//       navigate('/login/guest')
+//     }
+//   }
+
+// In PublicationDetailPage.jsx, update the handleReadNow function:
+
+const handleReadNow = () => {
+  if (user) {
+    // User is authenticated, go to reader page
+    navigate(`/read/${publication.id}`)
+  } else {
+    // User is not authenticated, save the current location and redirect to login
+    showToast('Please login or register as guest to read this publication', 'info')
+    navigate('/login/guest', { state: { from: { pathname: `/read/${publication.id}` } } })
   }
+}
 
   const handleShare = () => {
     if (navigator.share) {
