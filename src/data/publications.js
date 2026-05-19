@@ -205,7 +205,7 @@ export const publications = [
     id: 2,
     title: "AS 2 Valuation of Inventories",
     committee: "Accounting Standards Board",
-    topic: "Accounting Standards",
+    topic: "Taxation Committee",
     description:
       "Standards relating to inventory valuation methods, cost determination, and disclosure requirements.",
     cover:
@@ -222,7 +222,7 @@ export const publications = [
     id: 3,
     title: "AS 3 Cash Flow Statements",
     committee: "Accounting Standards Board",
-    topic: "Accounting Standards",
+    topic: "Ethics & Independence",
     description:
       "Framework for preparation and presentation of cash flow statements showing operating, investing, and financing activities.",
     cover:
@@ -239,8 +239,8 @@ export const publications = [
     id: 4,
     title:
       "AS 4 Contingencies and Events Occurring After the Balance Sheet Date",
-    committee: "Accounting Standards Board",
-    topic: "Accounting Standards",
+    committee: "Corporate Laws",
+    topic: "Financial Reporting",
     description:
       "Provides accounting treatment for contingencies and events occurring after the balance sheet date.",
     cover:
@@ -257,8 +257,8 @@ export const publications = [
     id: 5,
     title:
       "AS 5 Net Profit or Loss for the Period, Prior Period Items and Changes in Accounting Policies",
-    committee: "Accounting Standards Board",
-    topic: "Accounting Standards",
+    committee: "Taxation Committee",
+     topic: "Taxation",
     description:
       "Guidelines for classification and disclosure of prior period items, extraordinary items, and accounting policy changes.",
     cover:
