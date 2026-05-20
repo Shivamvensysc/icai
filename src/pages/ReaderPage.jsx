@@ -1,436 +1,9 @@
-// import React, { useState, useEffect, useRef } from "react";
-
-// import { useParams, Link, useNavigate } from "react-router-dom";
-
-// import {
-//   FaArrowLeft,
-//   FaChevronLeft,
-//   FaChevronRight,
-//   FaSearchPlus,
-//   FaSearchMinus,
-//   FaSearch,
-//   FaDownload,
-//   FaPrint,
-//   FaTimes,
-// } from "react-icons/fa";
-
-// import { Document, Page, pdfjs } from "react-pdf";
-
-// import { publications } from "../data/publications";
-
-// import "react-pdf/dist/Page/AnnotationLayer.css";
-// import "react-pdf/dist/Page/TextLayer.css";
-
-// // PDF WORKER
-// pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-//   "pdfjs-dist/build/pdf.worker.min.mjs",
-//   import.meta.url,
-// ).toString();
-
-// const ReaderPage = () => {
-//   const thumbnailRefs = useRef([]);
-//   const { id } = useParams();
-//   const navigate = useNavigate();
-//   const publication = publications.find((p) => p.id === parseInt(id));
-//   const [numPages, setNumPages] = useState(null);
-//   const [pageNumber, setPageNumber] = useState(1);
-//   const [scale, setScale] = useState(1.2);
-//   const [searchTerm, setSearchTerm] = useState("");
-//   const [searchResults, setSearchResults] = useState([]);
-//   const [showSearch, setShowSearch] = useState(false);
-//   const [pdfError, setPdfError] = useState(false);
-//   const [loading, setLoading] = useState(true);
-
-//   // AUTO SCROLL SIDEBAR
-//   useEffect(() => {
-//     const currentThumbnail = thumbnailRefs.current[pageNumber - 1];
-
-//     if (currentThumbnail) {
-//       currentThumbnail.scrollIntoView({
-//         behavior: "smooth",
-//         block: "center",
-//       });
-//     }
-//   }, [pageNumber]);
-
-//   // CHECK PUBLICATION
-//   useEffect(() => {
-//     if (!publication) {
-//       navigate("/");
-//     }
-//   }, [publication, navigate]);
-
-//   // DISABLE RIGHT CLICK
-//   const disableContextMenu = (e) => {
-//     e.preventDefault();
-//   };
-
-//   // DISABLE COPY SHORTCUTS
-//   const disableCopy = (e) => {
-//     if (
-//       (e.ctrlKey || e.metaKey) &&
-//       ["c", "u", "s", "p"].includes(e.key.toLowerCase())
-//     ) {
-//       e.preventDefault();
-//     }
-
-//     if (e.key === "PrintScreen") {
-//       e.preventDefault();
-//     }
-//   };
-
-//   // ADD EVENTS
-//   useEffect(() => {
-//     document.addEventListener("contextmenu", disableContextMenu);
-
-//     document.addEventListener("keydown", disableCopy);
-
-//     return () => {
-//       document.removeEventListener("contextmenu", disableContextMenu);
-
-//       document.removeEventListener("keydown", disableCopy);
-//     };
-//   }, []);
-
-//   if (!publication) {
-//     return (
-//       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-//         <div className="text-white text-center">
-//           <p className="text-xl">Publication not found</p>
-
-//           <Link
-//             to="/"
-//             className="text-blue-400 hover:underline mt-4 inline-block"
-//           >
-//             Go back home
-//           </Link>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   // PDF SUCCESS
-//   const onDocumentLoadSuccess = ({ numPages }) => {
-//     setNumPages(numPages);
-//     setPdfError(false);
-//     setLoading(false);
-//   };
-
-//   // PDF ERROR
-//   const onDocumentLoadError = (error) => {
-//     console.error("PDF Load Error:", error);
-//     setPdfError(true);
-//     setLoading(false);
-//   };
-
-//   // NEXT PAGE
-//   const nextPage = () => {
-//     if (pageNumber < numPages) {
-//       setPageNumber(pageNumber + 1);
-//     }
-//   };
-
-//   // PREV PAGE
-//   const prevPage = () => {
-//     if (pageNumber > 1) {
-//       setPageNumber(pageNumber - 1);
-//     }
-//   };
-
-//   // ZOOM IN
-//   const zoomIn = () => {
-//     setScale((prev) => Math.min(prev + 0.25, 3));
-//   };
-
-//   // ZOOM OUT
-//   const zoomOut = () => {
-//     setScale((prev) => Math.max(prev - 0.25, 0.5));
-//   };
-
-//   // FIT WIDTH
-//   const fitToWidth = () => {
-//     setScale(1.2);
-//   };
-
-//   // FIT PAGE
-//   const fitToPage = () => {
-//     setScale(0.8);
-//   };
-
-//   // SEARCH
-//   const handleSearch = () => {
-//     if (searchTerm.trim()) {
-//       setSearchResults([
-//         {
-//           page: 1,
-//           text: `Found "${searchTerm}" in document`,
-//         },
-//       ]);
-//     }
-//   };
-
-//   // DOWNLOAD
-//   const handleDownload = () => {
-//     window.open(publication.pdfUrl, "_blank");
-//   };
-
-//   // PRINT
-//   const handlePrint = () => {
-//     window.print();
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-[#0b1120] overflow-hidden select-none">
-//       {/* HEADER */}
-//       <div className="bg-blue-900 text-white sticky top-0 z-50 shadow-lg">
-//         <div className="px-4 py-3">
-//           {/* TOP BAR */}
-//           <div className="flex flex-wrap justify-between items-center gap-3">
-//             <Link
-//               to="/"
-//               className="hover:opacity-80 transition flex items-center gap-2"
-//             >
-//               <FaArrowLeft />
-//               Back to Portal
-//             </Link>
-
-//             <h2 className="font-semibold text-lg truncate flex-1 text-center">
-//               {publication.title}
-//             </h2>
-
-//             <div className="flex gap-2">
-//               <button
-//                 onClick={() => setShowSearch(!showSearch)}
-//                 className="hover:bg-white/20 px-3 py-2 rounded-lg transition"
-//               >
-//                 <FaSearch />
-//               </button>
-
-//               <button
-//                 onClick={handleDownload}
-//                 className="hover:bg-white/20 px-3 py-2 rounded-lg transition"
-//               >
-//                 <FaDownload />
-//               </button>
-
-//               <button
-//                 onClick={handlePrint}
-//                 className="hover:bg-white/20 px-3 py-2 rounded-lg transition"
-//               >
-//                 <FaPrint />
-//               </button>
-//             </div>
-//           </div>
-
-//           {/* CONTROLS */}
-//           <div className="flex flex-wrap justify-center items-center gap-3 mt-3 pt-3 border-t border-white/20">
-//             <button
-//               onClick={prevPage}
-//               disabled={pageNumber <= 1}
-//               className="hover:bg-white/20 disabled:opacity-50 px-4 py-2 rounded-lg transition"
-//             >
-//               <FaChevronLeft className="inline" />
-//               Prev
-//             </button>
-
-//             <span className="text-sm">
-//               Page {pageNumber} of {numPages || "?"}
-//             </span>
-
-//             <button
-//               onClick={nextPage}
-//               disabled={pageNumber >= numPages}
-//               className="hover:bg-white/20 disabled:opacity-50 px-4 py-2 rounded-lg transition"
-//             >
-//               Next <FaChevronRight className="inline" />
-//             </button>
-
-//             <div className="w-px h-6 bg-white/30 mx-2"></div>
-
-//             <button
-//               onClick={zoomOut}
-//               className="hover:bg-white/20 px-3 py-2 rounded-lg transition"
-//             >
-//               <FaSearchMinus />
-//             </button>
-
-//             <span className="text-sm min-w-[60px] text-center">
-//               {Math.round(scale * 100)}%
-//             </span>
-
-//             <button
-//               onClick={zoomIn}
-//               className="hover:bg-white/20 px-3 py-2 rounded-lg transition"
-//             >
-//               <FaSearchPlus />
-//             </button>
-
-//             <div className="w-px h-6 bg-white/30 mx-2"></div>
-
-//             <button
-//               onClick={fitToWidth}
-//               className="hover:bg-white/20 px-3 py-2 rounded-lg text-sm transition"
-//             >
-//               Fit Width
-//             </button>
-
-//             <button
-//               onClick={fitToPage}
-//               className="hover:bg-white/20 px-3 py-2 rounded-lg text-sm transition"
-//             >
-//               Fit Page
-//             </button>
-//           </div>
-
-//           {/* SEARCH */}
-//           {showSearch && (
-//             <div className="mt-3 pt-3 border-t border-white/20">
-//               <div className="flex gap-2">
-//                 <input
-//                   type="text"
-//                   placeholder="Search within document..."
-//                   value={searchTerm}
-//                   onChange={(e) => setSearchTerm(e.target.value)}
-//                   onKeyDown={(e) => {
-//                     if (e.key === "Enter") {
-//                       handleSearch();
-//                     }
-//                   }}
-//                   className="flex-1 px-4 py-2 rounded-lg text-gray-900 outline-none"
-//                 />
-
-//                 <button
-//                   onClick={handleSearch}
-//                   className="bg-white text-blue-900 px-4 py-2 rounded-lg font-semibold"
-//                 >
-//                   Search
-//                 </button>
-
-//                 <button
-//                   onClick={() => setShowSearch(false)}
-//                   className="bg-white/20 px-4 py-2 rounded-lg"
-//                 >
-//                   <FaTimes />
-//                 </button>
-//               </div>
-//             </div>
-//           )}
-//         </div>
-//       </div>
-
-//       {/* PDF LAYOUT */}
-//       <div className="h-[calc(100vh-145px)] flex">
-//         {/* SIDEBAR */}
-//         <div className="hidden md:flex w-48 bg-[#111827] border-r border-gray-700 flex-col">
-//           <div className="p-3 border-b border-gray-700">
-//             <h3 className="text-white text-sm font-semibold text-center">
-//               Pages
-//             </h3>
-//           </div>
-
-//           <div className="flex-1 overflow-y-auto p-3 space-y-3">
-//             {!pdfError && (
-//               <Document
-//                 file={publication.pdfUrl}
-//                 loading={<p className="text-white text-center">Loading...</p>}
-//               >
-//                 {numPages &&
-//                   Array.from(new Array(numPages), (el, index) => (
-//                     <div
-//                       key={`thumb_${index + 1}`}
-//                       ref={(el) => (thumbnailRefs.current[index] = el)}
-//                       onClick={() => setPageNumber(index + 1)}
-//                       className={`cursor-pointer rounded-lg overflow-hidden border-2 transition ${
-//                         pageNumber === index + 1
-//                           ? "border-blue-500"
-//                           : "border-transparent hover:border-gray-500"
-//                       }`}
-//                     >
-//                       <Page
-//                         pageNumber={index + 1}
-//                         width={140}
-//                         renderTextLayer={false}
-//                         renderAnnotationLayer={false}
-//                       />
-
-//                       <div className="bg-gray-900 text-white text-xs text-center py-1">
-//                         Page {index + 1}
-//                       </div>
-//                     </div>
-//                   ))}
-//               </Document>
-//             )}
-//           </div>
-//         </div>
-
-//         {/* MAIN PDF */}
-//         <div className="flex-1 overflow-auto bg-[#0f172a] p-6">
-//           <div className="flex justify-center">
-//             <div className="bg-gray-800 p-4 rounded-2xl shadow-2xl">
-//               <Document
-//                 file={publication.pdfUrl}
-//                 onLoadSuccess={onDocumentLoadSuccess}
-//                 onLoadError={onDocumentLoadError}
-//               >
-//                 {!pdfError && (
-//                   <div
-//                     draggable={false}
-//                     onDragStart={(e) => e.preventDefault()}
-//                   >
-//                     <Page
-//                       pageNumber={pageNumber}
-//                       scale={scale}
-//                       className="shadow-2xl"
-//                       renderTextLayer={false}
-//                       renderAnnotationLayer={false}
-//                     />
-//                   </div>
-//                 )}
-//               </Document>
-
-//               {/* ERROR */}
-//               {pdfError && (
-//                 <div className="flex items-center justify-center h-96 w-[600px]">
-//                   <div className="text-center text-white">
-//                     <div className="text-red-400 text-6xl mb-4">📄</div>
-
-//                     <p className="text-red-400 text-lg font-semibold">
-//                       Failed to load PDF
-//                     </p>
-
-//                     <button
-//                       onClick={handleDownload}
-//                       className="mt-4 bg-blue-900 px-4 py-2 rounded-lg"
-//                     >
-//                       Download PDF
-//                     </button>
-//                   </div>
-//                 </div>
-//               )}
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* FOOTER */}
-//       <div className="fixed bottom-4 right-4 bg-black/70 text-white text-xs px-3 py-2 rounded-lg shadow-lg">
-//         🔒 DRM Protected
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ReaderPage;
-
-
 import React, { useState, useEffect, useRef } from "react";
 
 import { useParams, Link, useNavigate } from "react-router-dom";
 
 import {
   FaArrowLeft,
-  FaChevronLeft,
-  FaChevronRight,
   FaSearchPlus,
   FaSearchMinus,
   FaSearch,
@@ -440,6 +13,8 @@ import {
 } from "react-icons/fa";
 
 import { Document, Page, pdfjs } from "react-pdf";
+
+import HTMLFlipBook from "react-pageflip";
 
 import { publications } from "../data/publications";
 
@@ -455,35 +30,30 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 const ReaderPage = () => {
   const thumbnailRefs = useRef([]);
 
+  const flipBookRef = useRef(null);
+
   const { id } = useParams();
 
   const navigate = useNavigate();
 
-  const publication = publications.find(
-    (p) => p.id === parseInt(id),
-  );
+  const publication = publications.find((p) => p.id === parseInt(id));
 
   const [numPages, setNumPages] = useState(null);
 
-  // START PAGE
   const [pageNumber, setPageNumber] = useState(1);
 
-  const [scale, setScale] = useState(1.0);
+  // DEFAULT ZOOM
+  const [scale, setScale] = useState(0.9);
 
   const [searchTerm, setSearchTerm] = useState("");
-
-  const [searchResults, setSearchResults] = useState([]);
 
   const [showSearch, setShowSearch] = useState(false);
 
   const [pdfError, setPdfError] = useState(false);
 
-  const [loading, setLoading] = useState(true);
-
   // AUTO SCROLL SIDEBAR
   useEffect(() => {
-    const currentThumbnail =
-      thumbnailRefs.current[pageNumber - 1];
+    const currentThumbnail = thumbnailRefs.current[pageNumber - 1];
 
     if (currentThumbnail) {
       currentThumbnail.scrollIntoView({
@@ -509,9 +79,7 @@ const ReaderPage = () => {
   const disableCopy = (e) => {
     if (
       (e.ctrlKey || e.metaKey) &&
-      ["c", "u", "s", "p"].includes(
-        e.key.toLowerCase(),
-      )
+      ["c", "u", "s", "p"].includes(e.key.toLowerCase())
     ) {
       e.preventDefault();
     }
@@ -523,36 +91,68 @@ const ReaderPage = () => {
 
   // ADD EVENTS
   useEffect(() => {
-    document.addEventListener(
-      "contextmenu",
-      disableContextMenu,
-    );
+    document.addEventListener("contextmenu", disableContextMenu);
 
-    document.addEventListener(
-      "keydown",
-      disableCopy,
-    );
+    document.addEventListener("keydown", disableCopy);
 
     return () => {
-      document.removeEventListener(
-        "contextmenu",
-        disableContextMenu,
-      );
+      document.removeEventListener("contextmenu", disableContextMenu);
 
-      document.removeEventListener(
-        "keydown",
-        disableCopy,
-      );
+      document.removeEventListener("keydown", disableCopy);
     };
   }, []);
+
+  // PDF SUCCESS
+  const onDocumentLoadSuccess = ({ numPages }) => {
+    setNumPages(numPages);
+
+    setPdfError(false);
+  };
+
+  // PDF ERROR
+  const onDocumentLoadError = (error) => {
+    console.error("PDF Load Error:", error);
+
+    setPdfError(true);
+  };
+
+  // ZOOM IN
+  const zoomIn = () => {
+    setScale((prev) => Math.min(prev + 0.1, 1.5));
+  };
+
+  // ZOOM OUT
+  const zoomOut = () => {
+    setScale((prev) => Math.max(prev - 0.1, 0.6));
+  };
+
+  // FIT PAGE
+  const fitToPage = () => {
+    setScale(0.9);
+  };
+
+  // SEARCH
+  const handleSearch = () => {
+    if (searchTerm.trim()) {
+      alert(`Search "${searchTerm}" functionality can be added`);
+    }
+  };
+
+  // DOWNLOAD
+  const handleDownload = () => {
+    window.open(publication.pdfUrl, "_blank");
+  };
+
+  // PRINT
+  const handlePrint = () => {
+    window.print();
+  };
 
   if (!publication) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-white text-center">
-          <p className="text-xl">
-            Publication not found
-          </p>
+          <p className="text-xl">Publication not found</p>
 
           <Link
             to="/"
@@ -565,398 +165,250 @@ const ReaderPage = () => {
     );
   }
 
-  // PDF SUCCESS
-  const onDocumentLoadSuccess = ({
-    numPages,
-  }) => {
-    setNumPages(numPages);
+  // RESPONSIVE WIDTH
+  const bookWidth = Math.min(
+    650,
+    window.innerWidth - (window.innerWidth >= 768 ? 320 : 40),
+  );
 
-    setPdfError(false);
+  const bookHeight = bookWidth * 1.3;
 
-    setLoading(false);
-  };
-
-  // PDF ERROR
-  const onDocumentLoadError = (error) => {
-    console.error("PDF Load Error:", error);
-
-    setPdfError(true);
-
-    setLoading(false);
-  };
-
-  // NEXT PAGE
-  const nextPage = () => {
-    if (pageNumber + 2 <= numPages) {
-      setPageNumber((prev) => prev + 2);
-    }
-  };
-
-  // PREVIOUS PAGE
-  const prevPage = () => {
-    if (pageNumber - 2 >= 1) {
-      setPageNumber((prev) => prev - 2);
-    }
-  };
-
-  // ZOOM IN
-  const zoomIn = () => {
-    setScale((prev) =>
-      Math.min(prev + 0.25, 3),
-    );
-  };
-
-  // ZOOM OUT
-  const zoomOut = () => {
-    setScale((prev) =>
-      Math.max(prev - 0.25, 0.5),
-    );
-  };
-
-  // FIT WIDTH
-  const fitToWidth = () => {
-    setScale(1.2);
-  };
-
-  // FIT PAGE
-  const fitToPage = () => {
-    setScale(0.8);
-  };
-
-  // SEARCH
-  const handleSearch = () => {
-    if (searchTerm.trim()) {
-      setSearchResults([
-        {
-          page: 1,
-          text: `Found "${searchTerm}" in document`,
-        },
-      ]);
-    }
-  };
-
-  // DOWNLOAD
-  const handleDownload = () => {
-    window.open(
-      publication.pdfUrl,
-      "_blank",
-    );
-  };
-
-  // PRINT
-  const handlePrint = () => {
-    window.print();
-  };
+  const pdfWidth = Math.min(
+    600,
+    window.innerWidth - (window.innerWidth >= 768 ? 360 : 80),
+  );
 
   return (
-    <div className="min-h-screen bg-[#0b1120] overflow-hidden select-none">
+    <div className="min-h-screen bg-[#081225] overflow-hidden select-none">
       {/* HEADER */}
-      <div className="bg-blue-900 text-white sticky top-0 z-50 shadow-lg">
+      <div className="bg-[#1e3a8a] text-white sticky top-0 z-50 shadow-lg">
         <div className="px-4 py-3">
-          {/* TOP BAR */}
-          <div className="flex flex-wrap justify-between items-center gap-3">
-            <Link
-              to="/"
-              className="hover:opacity-80 transition flex items-center gap-2"
-            >
-              <FaArrowLeft />
-              Back to Portal
-            </Link>
+          {/* TOP HEADER */}
+          <div className="grid grid-cols-3 items-center">
+            {/* LEFT SECTION */}
+            <div className="flex items-center gap-4 min-w-0">
+              <Link
+                to="/"
+                className="flex items-center gap-2 hover:opacity-80 whitespace-nowrap"
+              >
+                <FaArrowLeft />
+                Back to Portal
+              </Link>
 
-            <h2 className="font-semibold text-lg truncate flex-1 text-center">
-              {publication.title}
-            </h2>
+              <h2 className="font-semibold text-lg truncate">
+                {publication.title}
+              </h2>
+            </div>
 
-            <div className="flex gap-2">
+            {/* CENTER TOOLBAR */}
+            <div className="flex justify-center items-center gap-6">
+              <button onClick={zoomOut} className="hover:text-gray-300">
+                <FaSearchMinus />
+              </button>
+
+              <span>{Math.round(scale * 100)}%</span>
+
+              <button onClick={zoomIn} className="hover:text-gray-300">
+                <FaSearchPlus />
+              </button>
+
+              <div className="h-6 w-px bg-white/30"></div>
+
+              <button onClick={fitToPage} className="hover:text-gray-300">
+                Fit Page
+              </button>
+
+              <div className="h-6 w-px bg-white/30"></div>
+
+              <span>
+                Page {pageNumber} of {numPages || "?"}
+              </span>
+            </div>
+
+            {/* RIGHT SECTION */}
+            <div className="flex items-center justify-end gap-4">
               <button
-                onClick={() =>
-                  setShowSearch(!showSearch)
-                }
-                className="hover:bg-white/20 px-3 py-2 rounded-lg transition"
+                onClick={() => setShowSearch(!showSearch)}
+                className="hover:text-gray-300"
               >
                 <FaSearch />
               </button>
 
-              <button
-                onClick={handleDownload}
-                className="hover:bg-white/20 px-3 py-2 rounded-lg transition"
-              >
+              <button onClick={handleDownload} className="hover:text-gray-300">
                 <FaDownload />
               </button>
 
-              <button
-                onClick={handlePrint}
-                className="hover:bg-white/20 px-3 py-2 rounded-lg transition"
-              >
+              <button onClick={handlePrint} className="hover:text-gray-300">
                 <FaPrint />
               </button>
             </div>
           </div>
 
-          {/* CONTROLS */}
-          <div className="flex flex-wrap justify-center items-center gap-3 mt-3 pt-3 border-t border-white/20">
-            <button
-              onClick={prevPage}
-              disabled={pageNumber <= 1}
-              className="hover:bg-white/20 disabled:opacity-50 px-4 py-2 rounded-lg transition"
-            >
-              <FaChevronLeft className="inline" />
-              Prev
-            </button>
-
-            <span className="text-sm">
-              Pages {pageNumber}
-              {pageNumber + 1 <= numPages &&
-                ` - ${pageNumber + 1}`}{" "}
-              of {numPages || "?"}
-            </span>
-
-            <button
-              onClick={nextPage}
-              disabled={
-                pageNumber + 1 >= numPages
-              }
-              className="hover:bg-white/20 disabled:opacity-50 px-4 py-2 rounded-lg transition"
-            >
-              Next{" "}
-              <FaChevronRight className="inline" />
-            </button>
-
-            <div className="w-px h-6 bg-white/30 mx-2"></div>
-
-            <button
-              onClick={zoomOut}
-              className="hover:bg-white/20 px-3 py-2 rounded-lg transition"
-            >
-              <FaSearchMinus />
-            </button>
-
-            <span className="text-sm min-w-[60px] text-center">
-              {Math.round(scale * 100)}%
-            </span>
-
-            <button
-              onClick={zoomIn}
-              className="hover:bg-white/20 px-3 py-2 rounded-lg transition"
-            >
-              <FaSearchPlus />
-            </button>
-
-            <div className="w-px h-6 bg-white/30 mx-2"></div>
-
-            <button
-              onClick={fitToWidth}
-              className="hover:bg-white/20 px-3 py-2 rounded-lg text-sm transition"
-            >
-              Fit Width
-            </button>
-
-            <button
-              onClick={fitToPage}
-              className="hover:bg-white/20 px-3 py-2 rounded-lg text-sm transition"
-            >
-              Fit Page
-            </button>
-          </div>
-
           {/* SEARCH */}
           {showSearch && (
-            <div className="mt-3 pt-3 border-t border-white/20">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Search within document..."
-                  value={searchTerm}
-                  onChange={(e) =>
-                    setSearchTerm(
-                      e.target.value,
-                    )
+            <div className="mt-4 flex gap-2">
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
                   }
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSearch();
-                    }
-                  }}
-                  className="flex-1 px-4 py-2 rounded-lg text-gray-900 outline-none"
-                />
+                }}
+                className="flex-1 px-4 py-2 rounded-lg text-black outline-none"
+              />
 
-                <button
-                  onClick={handleSearch}
-                  className="bg-white text-blue-900 px-4 py-2 rounded-lg font-semibold"
-                >
-                  Search
-                </button>
+              <button
+                onClick={handleSearch}
+                className="bg-white text-blue-900 px-4 py-2 rounded-lg"
+              >
+                Search
+              </button>
 
-                <button
-                  onClick={() =>
-                    setShowSearch(false)
-                  }
-                  className="bg-white/20 px-4 py-2 rounded-lg"
-                >
-                  <FaTimes />
-                </button>
-              </div>
+              <button
+                onClick={() => setShowSearch(false)}
+                className="bg-white/20 px-4 py-2 rounded-lg"
+              >
+                <FaTimes />
+              </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* PDF LAYOUT */}
-      <div className="h-[calc(100vh-145px)] flex">
+      {/* BODY */}
+      <div className="h-[calc(100vh-10px)] flex">
         {/* SIDEBAR */}
-        <div className="hidden md:flex w-48 bg-[#111827] border-r border-gray-700 flex-col">
-          <div className="p-3 border-b border-gray-700">
-            <h3 className="text-white text-sm font-semibold text-center">
-              Pages
-            </h3>
+        <div className="hidden md:flex w-40 bg-[#0f172a] border-r border-gray-700 flex-col">
+          <div className="p-1 border-b border-gray-700">
+            <h3 className="text-white text-center font-semibold">Pages</h3>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-3 space-y-3">
+          <div className="flex-1 overflow-y-auto p-2 space-y-3 flex flex-col items-center">
             {!pdfError && (
-              <Document
-                file={publication.pdfUrl}
-                loading={
-                  <p className="text-white text-center">
-                    Loading...
-                  </p>
-                }
-              >
+              <Document file={publication.pdfUrl}>
                 {numPages &&
-                  Array.from(
-                    new Array(numPages),
-                    (el, index) => (
-                      <div
-                        key={`thumb_${
-                          index + 1
-                        }`}
-                        ref={(el) =>
-                          (thumbnailRefs.current[
-                            index
-                          ] = el)
-                        }
-                        onClick={() =>
-                          setPageNumber(
-                            index + 1,
-                          )
-                        }
-                        className={`cursor-pointer rounded-lg overflow-hidden border-2 transition ${
-                          pageNumber ===
-                          index + 1
-                            ? "border-blue-500"
-                            : "border-transparent hover:border-gray-500"
-                        }`}
-                      >
-                        <Page
-                          pageNumber={
-                            index + 1
-                          }
-                          width={140}
-                          renderTextLayer={
-                            false
-                          }
-                          renderAnnotationLayer={
-                            false
-                          }
-                        />
+                  Array.from(new Array(numPages), (el, index) => (
+                    <div
+                      key={`thumb_${index + 1}`}
+                      ref={(el) => (thumbnailRefs.current[index] = el)}
+                      onClick={() => {
+                        setPageNumber(index + 1);
 
-                        <div className="bg-gray-900 text-white text-xs text-center py-1">
-                          Page {index + 1}
-                        </div>
+                        if (flipBookRef.current) {
+                          flipBookRef.current.pageFlip().flip(index);
+                        }
+                      }}
+                      className={`w-full max-w-[170px] cursor-pointer rounded-xl overflow-hidden border-2 transition ${
+                        pageNumber === index + 1
+                          ? "border-blue-500"
+                          : "border-transparent hover:border-gray-500"
+                      }`}
+                    >
+                      <Page
+                        pageNumber={index + 1}
+                        width={150}
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                      />
+
+                      <div className="bg-gray-900 text-white text-center py-2 text-sm">
+                        Page {index + 1}
                       </div>
-                    ),
-                  )}
+                    </div>
+                  ))}
               </Document>
             )}
           </div>
         </div>
 
         {/* MAIN PDF */}
-        <div className="flex-1 overflow-auto bg-[#0f172a] p-6">
-          <div className="flex justify-center">
-            <div className="bg-gray-800 p-4 rounded-2xl shadow-2xl">
-              <Document
-                file={publication.pdfUrl}
-                onLoadSuccess={
-                  onDocumentLoadSuccess
-                }
-                onLoadError={
-                  onDocumentLoadError
-                }
-              >
-                {!pdfError && (
-                  <div
-                    className="flex gap-4 justify-center flex-wrap"
-                    draggable={false}
-                    onDragStart={(e) =>
-                      e.preventDefault()
-                    }
+        <div className="flex-1 overflow-y-auto overflow-x-hidden bg-[#081225]">
+          <div className="w-full flex justify-center items-start min-h-full  px-4">
+            <Document
+              file={publication.pdfUrl}
+              onLoadSuccess={onDocumentLoadSuccess}
+              onLoadError={onDocumentLoadError}
+            >
+              {!pdfError && numPages && (
+                <div
+                  style={{
+                    zoom: scale,
+                  }}
+                >
+                  <HTMLFlipBook
+                    ref={flipBookRef}
+                    width={bookWidth}
+                    height={bookHeight}
+                    size="fixed"
+                    minWidth={300}
+                    maxWidth={650}
+                    minHeight={400}
+                    maxHeight={900}
+                    drawShadow={true}
+                    flippingTime={1000}
+                    usePortrait={false}
+                    startPage={0}
+                    autoSize={false}
+                    mobileScrollSupport={true}
+                    maxShadowOpacity={0.6}
+                    showCover={true}
+                    className="shadow-2xl"
+                    style={{
+                      margin: "0 auto",
+                    }}
+                    onFlip={(e) => setPageNumber(e.data + 1)}
                   >
-                    {/* LEFT PAGE */}
-                    <Page
-                      pageNumber={
-                        pageNumber
-                      }
-                      scale={scale}
-                      className="shadow-2xl"
-                      renderTextLayer={
-                        false
-                      }
-                      renderAnnotationLayer={
-                        false
-                      }
-                    />
-
-                    {/* RIGHT PAGE */}
-                    {pageNumber + 1 <=
-                      numPages && (
-                      <Page
-                        pageNumber={
-                          pageNumber + 1
-                        }
-                        scale={scale}
-                        className="shadow-2xl"
-                        renderTextLayer={
-                          false
-                        }
-                        renderAnnotationLayer={
-                          false
-                        }
-                      />
-                    )}
-                  </div>
-                )}
-              </Document>
-
-              {/* ERROR */}
-              {pdfError && (
-                <div className="flex items-center justify-center h-96 w-[600px]">
-                  <div className="text-center text-white">
-                    <div className="text-red-400 text-6xl mb-4">
-                      📄
-                    </div>
-
-                    <p className="text-red-400 text-lg font-semibold">
-                      Failed to load PDF
-                    </p>
-
-                    <button
-                      onClick={
-                        handleDownload
-                      }
-                      className="mt-4 bg-blue-900 px-4 py-2 rounded-lg"
-                    >
-                      Download PDF
-                    </button>
-                  </div>
+                    {Array.from(new Array(numPages), (el, index) => (
+                      <div
+                        key={`page_${index + 1}`}
+                        className="bg-[#e5e5e5] flex items-center justify-center overflow-hidden"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                        }}
+                      >
+                        <Page
+                          pageNumber={index + 1}
+                          width={pdfWidth}
+                          renderTextLayer={false}
+                          renderAnnotationLayer={false}
+                          loading={<div className="text-black">Loading...</div>}
+                        />
+                      </div>
+                    ))}
+                  </HTMLFlipBook>
                 </div>
               )}
-            </div>
+            </Document>
+
+            {/* ERROR */}
+            {pdfError && (
+              <div className="flex items-center justify-center h-96 w-[700px] bg-gray-800 rounded-2xl">
+                <div className="text-center text-white">
+                  <div className="text-red-400 text-6xl mb-4">📄</div>
+
+                  <p className="text-red-400 text-lg font-semibold">
+                    Failed to load PDF
+                  </p>
+
+                  <button
+                    onClick={handleDownload}
+                    className="mt-4 bg-blue-900 px-4 py-2 rounded-lg"
+                  >
+                    Download PDF
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* FOOTER */}
-      <div className="fixed bottom-4 right-4 bg-black/70 text-white text-xs px-3 py-2 rounded-lg shadow-lg">
+      <div className="fixed bottom-4 right-4 bg-black/70 text-white text-xs px-4 py-3 rounded-xl shadow-lg">
         🔒 DRM Protected
       </div>
     </div>
